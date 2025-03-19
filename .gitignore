@@ -4,3 +4,6 @@
 *.MAP
 *.TR
 *.TD
+result.txt
+# TESTS/CMP.RES
+# TESTS/TEST.RES
