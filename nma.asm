@@ -6,6 +6,11 @@ start:
     call copy_param
     call read_file
 
+    ;file size limit 32000 byte control
+    cmp limit, 0
+    jne end
+
+    end:
     mov ax, 4C00h
     int 21h
 
@@ -31,7 +36,7 @@ mov address, ax
 
 mov ah, 3Fh    ;Read 
 mov bx, address ;Source
-mov cx, 256    ;Number of bytes to read
+mov cx, 32001    ;Number of bytes to read
 mov dx, offset buffer ;Destination
 int 21h  
 
@@ -49,6 +54,8 @@ read_file endp
 
 filename db '          ', '$'
 address dw '$'
-buffer db 256 dup('$')
+buffer db 32000 dup('$')
+limit db 0
+
 
 end start
