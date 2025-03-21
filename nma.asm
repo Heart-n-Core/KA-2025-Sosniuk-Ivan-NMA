@@ -2,13 +2,49 @@
 .code
 org 100h
 start:
-
+    mov [buffer+32000], '$'
     call copy_param
     call read_file
 
-    ;file size limit 32000 byte control
-    cmp limit, 0
+    cmp [buffer+32000], '$';file size limit 32000 byte control
     jne end
+
+    mov si, offset buffer       ;locate line and rules in appropriate vars
+    mov ax, [si]
+    add si, ax
+    add line, si    
+    mov ax, [si+4]
+    mov bx, ax
+    mov line_size, bx
+    add si, ax
+    add si, 6
+    mov [si], '$$'     ;clear 0d0a
+    mov ax, [si+2]
+    mov cx, ax      ;rule length
+    add cx, 6
+    push cx
+    mov di, line
+    add di, 32767    ;-1
+    add di, cx
+    add si, cx
+    dec si
+    std
+    rep movsb
+    pop ax
+    mov cx, 32771  ;+3
+    sub cx, bx
+    inc di
+    mov rules, di
+    mov di, si
+    inc di
+    mov ax, '$'       ;set symbol for filling gap
+    cld
+    rep stosb
+
+    print:
+    mov ah, 9h      ;display working line - final result
+    mov dx, [line]
+    int 21h
 
     end:
     mov ax, 4C00h
@@ -45,17 +81,17 @@ MOV BX, address
 INT 21h
 
 ;TEMPORARY display file content
-mov ah, 9h
-mov dx, offset buffer
-int 21h
+; mov ah, 9h
+; mov dx, offset buffer
+; int 21h
 
 ret
 read_file endp
 
+rules dw 0     ;pointer at rules
+line dw 8       ;pointer at line
 filename db '          ', '$'
 address dw '$'
-buffer db 32000 dup('$')
-limit db 0
-
-
+line_size dw 0
+buffer db 0
 end start
