@@ -50,6 +50,13 @@ start:
     mov ax, 4C00h
     int 21h
 
+    exceed:     ;line size exceed case for future(recover and output original line)
+    call read_file
+    mov di, line
+    add di, line_size
+    mov [di], '$'
+    jmp print
+
 copy_param proc
     ; ds = PSP
     mov cx, ds:[80h]
